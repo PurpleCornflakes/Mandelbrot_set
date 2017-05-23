@@ -9,25 +9,23 @@ void C_mat_gen();
 void OneIteration();
 double norm();
 void array_to_file();
-
-double h = 0.01;
-int n_max;
  
 int main(int argc, char const *argv[])
 {
-	double x0 = -2.2, y0 = -2.2;
+	int n_max = atoi(argv[1]);//?atoi(argv[1]):10;
+	double h = atof(argv[2]);//?atof(argv[2]):(4.5/N);
+	double x0 = atof(argv[3]);//?atof(argv[3]):-2.2;
+	double y0 = atof(argv[4]);//?atof(argv[4]):-2.2;
 	double ***C_mat;
 	int ** n;
-	const char * filename;
+	char * filename;
 	filename = "result.csv";
 	FILE * file;
 
-	if (argv[1]) n_max = atoi(argv[1]);
-	else {
-		printf("Please specify n_max\n");
-	}
 
 	file = fopen(filename, "w");
+
+
 
 	// initialize C_mat
 	C_mat = (double ***) malloc(N*sizeof(double **));
@@ -46,7 +44,7 @@ int main(int argc, char const *argv[])
 	}
 	// array_to_file(n, file);
 	// generates C_mat
-	C_mat_gen(C_mat, x0, y0);
+	C_mat_gen(C_mat, x0, y0, h);
 
 	for(int i = 0; i<n_max; i++){
 		printf("Iteration times: %d\n", i+1);
@@ -57,7 +55,7 @@ int main(int argc, char const *argv[])
 	fclose(file);
 }
 
-void C_mat_gen(double *** C_mat, double x0, double y0)
+void C_mat_gen(double *** C_mat, double x0, double y0, double h)
 {
 	/* generates C matrix
 	x0, y0: lower left coordinates
