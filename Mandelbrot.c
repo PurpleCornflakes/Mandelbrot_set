@@ -1,27 +1,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#define N 90
-#define M 90
+#define N 450
+#define M 450
 
 
 void C_mat_gen();
-int ij2Index(int i, int j);
-int * Index2ij(int index);
-double h = 0.05;
-int n_max = 3;
+void OneIteration();
+double norm();
+void array_to_file();
+
+double h = 0.01;
+int n_max;
  
 int main(int argc, char const *argv[])
 {
 	double x0 = -2.2, y0 = -2.2;
 	double ***C_mat;
 	int ** n;
-	char * filename;
+	const char * filename;
+	filename = "result.csv";
 	FILE * file;
-	if (argv[1]) file_name = argv[1];
+
+	if (argv[1]) n_max = atoi(argv[1]);
 	else {
-		filename = "mandelbrot_n.csv";
+		printf("Please specify n_max\n");
 	}
+
 	file = fopen(filename, "w");
 
 	// initialize C_mat
@@ -35,18 +40,21 @@ int main(int argc, char const *argv[])
 
 	n = (int **) malloc(N*sizeof(int *));
 	for(int i = 0; i < N; i++){
-		n[i] = (int *) malloc(M*sizeof(int))
+		n[i] = (int *) malloc(M*sizeof(int));
+		for(int j = 0; j<M; j++)
+			n[i][j] = 0;
 	}
+	// array_to_file(n, file);
 	// generates C_mat
 	C_mat_gen(C_mat, x0, y0);
+
 	for(int i = 0; i<n_max; i++){
-
+		printf("Iteration times: %d\n", i+1);
+		OneIteration(C_mat, n);
+		// array_to_file(n, file);
 	}
-
-
-
-
-	// printf("%d, %d, %d",ij2Index(1,1), Index2ij(6)[0],Index2ij(6)[1] );
+	array_to_file(n, file);
+	fclose(file);
 }
 
 void C_mat_gen(double *** C_mat, double x0, double y0)
@@ -71,15 +79,17 @@ void OneIteration(double *** C_mat, int ** n)
 	static double Z_mat[N][M][2];
 	static int passed[N*M];
 	static int iter_n;
-	iter_n++;
+	double z0,z1;
 	int i,j;
+	iter_n += 1;
 	for(i = 0; i<N; i++)
 		for(j = 0; j<M; j++){
 			if(passed[i*M+j]==1) continue;
-			Z_mat[i][j][0] = C_mat[i][j][0] 
-				+ Z_mat[i][j][0]*Z_mat[i][j][0] - Z_mat[i][j][1]*Z_mat[i][j][1];
-			Z_mat[i][j][1] = C_mat[i][j][1] + 2*Z_mat[i][j][1]*Z_mat[i][j][0];
-			if(norm(Z_mat[i][j]) >=2){
+			z0 = Z_mat[i][j][0];
+			z1 = Z_mat[i][j][1];
+			Z_mat[i][j][0] = C_mat[i][j][0] + z0*z0 - z1*z1;
+			Z_mat[i][j][1] = C_mat[i][j][1] + 2*z0*z1;
+			if(norm(Z_mat[i][j]) >= 2.0){
 				passed[i*M+j] = 1;
 				n[i][j] = iter_n;
 			}
@@ -91,7 +101,7 @@ double norm(double * vec)
 	return pow(vec[0]*vec[0]+vec[1]*vec[1], 0.5);
 }
 
-void 2Darray_to_file(int ** n, FILE * file)
+void array_to_file(int ** n, FILE * file)
 {
 	for(int i = 0; i<N; i++)
 		for(int j = 0; j<M; j++){
