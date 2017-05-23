@@ -3,7 +3,19 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 import itertools as it
 
-def next_z(C_mat):
+
+def C_Mat_gen(x0, y0, N, M, h):
+	'''
+	generates C matrix
+	'''
+	C_mat = np.zeros([N, M, 2])
+	for i in range(N):
+		for j in range(M):
+			C_mat[i,j]=np.array([x0+j*h,y0+(N-1-i)*h])
+
+	return C_mat
+
+def iterate(C_mat):
 	'''
 	C_mat: N*M*2 matrix
 	'''
@@ -22,25 +34,19 @@ def next_z(C_mat):
 					if la.norm(Z_mat[i,j]) >= 2:
 						passed.append((i,j))
 						current_passed.append((i,j))
-		yield  Z_mat, current_passed
+		yield current_passed
 
-# z1 = next_z(np.array([[[-1.5,1],[-1.5,1]]]))
-# print(z1.__next__())
-# print(z1.__next__())
-
-
-
-def draw_map(ax, C_mat, n_max=2):
-	colors = it.cycle(plt.cm.rainbow(np.linspace(0,1,n_max)))
-	# colors = it.cycle([np.array([1,0,0]), np.array([0,1,0]), np.array([0,0,1]),np.array([1,0,0])])
-	c = next(colors)
+def draw_map(ax, C_mat, n_max=3):
 	N, M, d = C_mat.shape
 	color_mat = np.zeros([N,M,3])
+	colors = it.cycle(plt.cm.rainbow(np.linspace(0,1,n_max)))
+	c = next(colors)
 
 	k = 0
-	for Z_mat, current_passed in next_z(C_mat):
+	for current_passed in iterate(C_mat):
 		k += 1 
 		if k > n_max: break
+		print("iteration times: {}".format(k))
 		for i in range(N):
 			for j in range(M):
 				if (i,j) in current_passed:
@@ -49,13 +55,6 @@ def draw_map(ax, C_mat, n_max=2):
 
 	ax.imshow(color_mat, interpolation="nearest")
 
-def C_Mat_gen(x0, y0, N, M, h):
-	C_mat = np.zeros([N, M, 2])
-	for i in range(N):
-		for j in range(M):
-			C_mat[i,j]=np.array([x0+j*h,y0+(N-1-i)*h])
-
-	return C_mat
 
 
 def main():
