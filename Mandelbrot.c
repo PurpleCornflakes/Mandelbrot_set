@@ -15,13 +15,14 @@ int main(int argc, char const *argv[])
 {
 	double x0 = -2.2, y0 = -2.2;
 	double ***C_mat;
+	int ** n;
+	char * filename;
 	FILE * file;
 	if (argv[1]) file_name = argv[1];
 	else {
-		printf("Please add filename\n");
-		return 1;
+		filename = "mandelbrot_n.csv";
 	}
-	file = fopen()
+	file = fopen(filename, "w");
 
 	// initialize C_mat
 	C_mat = (double ***) malloc(N*sizeof(double **));
@@ -31,8 +32,16 @@ int main(int argc, char const *argv[])
 			C_mat[i][j] = (double *) malloc(2*sizeof(double));
 		}
 	}
+
+	n = (int **) malloc(N*sizeof(int *));
+	for(int i = 0; i < N; i++){
+		n[i] = (int *) malloc(M*sizeof(int))
+	}
 	// generates C_mat
 	C_mat_gen(C_mat, x0, y0);
+	for(int i = 0; i<n_max; i++){
+
+	}
 
 
 
