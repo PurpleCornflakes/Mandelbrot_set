@@ -1,3 +1,5 @@
+# by Xiao Ling 22052017
+
 import numpy as np
 import numpy.linalg as la
 import matplotlib.pyplot as plt
@@ -26,8 +28,11 @@ def iterate(C_mat):
 	Z_mat = np.zeros([N, M, 2])
 	while True:
 		current_passed = []
+		k = 0
 		for i in range(N):
 			for j in range(M):
+				k += 1
+				print("process: {0:.2f}%".format(k/(N*M)*100))
 				z0 = Z_mat[i,j]
 				if (i,j) in passed: continue
 				Z_mat[i,j] = np.array([z0[0]**2-z0[1]**2, 2*z0[0]*z0[1]]) \
@@ -37,39 +42,46 @@ def iterate(C_mat):
 					current_passed.append((i,j))
 		yield current_passed
 
-def draw_map(ax, C_mat, n_max=3):
+def draw_map(img, C_mat, n_max=3):
 	'''
 	draws Mandelbrot set after n_max iterations
 	'''
+	true_color = True
 	N, M, d = C_mat.shape
-	color_mat = np.zeros([N,M,3])
-	colors = iter(plt.cm.rainbow(np.linspace(0,1,n_max+1)))
+	color_mat = np.zeros([N,M,3]) if true_color else np.zeros([N,M])
+	colors = iter(plt.cm.rainbow(np.linspace(0,1,n_max+1))) \
+		if true_color else iter(np.linspace(0,1,n_max+1))
 	c = next(colors)
 
-	k = 0
+	k = 1
+	print("iteration times: {}".format(k))
 	for current_passed in iterate(C_mat):
-		k += 1 
 		if k > n_max: break
-		print("iteration times: {}".format(k))
 		for i in range(N):
 			for j in range(M):
 				if (i,j) in current_passed:
-					color_mat[i,j] = c[:3]
+					color_mat[i,j] = c[:3] if true_color else c
 		c = next(colors)
+		k += 1 
+		print("iteration times: {}".format(k))
 
-	ax.imshow(color_mat, interpolation="nearest")
 
-def main():
+	img.set_data(color_mat)
+
+def static_draw():
 	fig, ax = plt.subplots()
 	ax.set_xticks([])
 	ax.set_yticks([])
-	C_mat = C_Mat_gen(x0 = -2.2, y0=-2.2, N = 90, M = 90, h = 0.05)
-	draw_map(ax, C_mat, n_max = 10)
+	h = 0.01; N = int(4.5/h); M = int(4.5/h)
+	img = ax.imshow(np.zeros([N,M]), cmap="gray", interpolation="nearest")
+
+	C_mat = C_Mat_gen(x0 = -2.2, y0=-2.2, N = N, M = M, h = h)
+	draw_map(img, C_mat, n_max = 3)
 	plt.savefig("n_max10.png", dpi = 300)
 	plt.show()
 
 if __name__ == "__main__":
-	main()
+	static_draw()
 
 
 
