@@ -14,5 +14,6 @@ for i in range(N):
 	for j in range(M):
 		color_mat[i,j] = colors[n[i,j]][:3]
 
-plt.imshow(n, cmap="gray", interpolation="nearest")
+extent = [-2.2, 2.2, -2.2, 2.2]
+plt.imshow(n, cmap="gray", interpolation="nearest", extent=extent)
 plt.show()
